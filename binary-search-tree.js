@@ -15,9 +15,10 @@ class BinarySearchTree {
    * Returns the tree. Uses iteration. */
 
   insert(val) {
-    let newNode = Node(val)
+    let newNode = new Node(val)
     if (this.root === null){
       this.root = newNode
+      return this
     } else {
       let current = this.root
       while (current) {
@@ -48,27 +49,20 @@ class BinarySearchTree {
 
   insertRecursively(val) {
     function checkForNull(node, val){
-      if(node.val === null){
-        node = newNode
+      if(node === null){
+        return new Node(val)
       } else{
         if(val>node.val){
-          if(node.right === null){
-            node.right = Node(val)
-          } else{
-            checkForNull(node.right, val)
-          }
+          node.right = checkForNull(node.right, val)
         } else if(val<node.val){
-          if(node.left === null){
-            node.left = Node(val)
-          } else{
-            checkForNull(node.left, val)
-          }
+          node.left = checkForNull(node.left, val)
         } else  {
           console.log("Value already exists in the tree")
         }
       }
+      return node
     }
-    checkForNull(this.root, val)
+    this.root = checkForNull(this.root, val)
 
     return this
   }
@@ -133,42 +127,32 @@ class BinarySearchTree {
    * Return an array of visited nodes. */
 
   dfsInOrder() {
-    function checkSmaller(node){
-      if (node === null){
-        return []
+    let answer = [];
+    const traverse = (node) => {
+      if (node) {
+        traverse(node.left);
+        answer.push(node.val);
+        traverse(node.right);
       }
-      let answer = []
-      if(node.left !== null){
-        answer.push(...checkSmaller(node.left))
-      }
-      answer.push(node.val)
-      if(node.right !== null){
-        answer.push(...checkSmaller(node.right))
-      }
-      return answer
-    }
-    return checkSmaller(this.root)
+    };
+    traverse(this.root);
+    return answer;
   }
 
   /** dfsPostOrder(): Traverse the array using post-order DFS.
    * Return an array of visited nodes. */
 
   dfsPostOrder() {
-    function checkNoChildren(node){
-      if (node === null){
-        return []
+    let answer = []
+    const traverse = (node) => {
+      if (node) {
+        traverse(node.left);
+        traverse(node.right);
+        answer.push(node.val);
       }
-      let answer = []
-      if(node.left !== null){
-        answer.push(...checkSmaller(node.left))
-      }
-      if(node.right !== null){
-        answer.push(...checkNoChildren(node.right))
-      }
-      answer.push(node.val)
-      return answer
-    }
-    return checkNoChildren(this.root)
+    };
+    traverse(this.root);
+    return answer;
   }
 
   /** bfs(): Traverse the array using BFS.
@@ -180,13 +164,14 @@ class BinarySearchTree {
     while(queue.length > 0){
       let current = queue.shift()
       answer.push(current.val)
-      if(current.right !== null){
-        queue.push(current.right)
-      }
       if(current.left !== null){
         queue.push(current.left)
       }
+      if(current.right !== null){
+        queue.push(current.right)
+      }
     }
+    return answer
   }
 
   /** Further Study!
